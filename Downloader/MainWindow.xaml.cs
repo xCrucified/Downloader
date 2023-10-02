@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -48,18 +49,35 @@ namespace Downloader
             string dest = destTxtBox.Text;
             string fileName = new Random().Next(1,1234).ToString() + ".png";
             string destination = Path.Combine(dest, fileName);
-            
-            await client.DownloadFileTaskAsync(address, destination);
-        }
 
-        private void Client_DownloadFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
-        {
-            MessageBox.Show("Download complete!");
+            try
+            {
+                await client.DownloadFileTaskAsync(address, destination);
+                MessageBox.Show("Download complete!");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error downloading file: {ex.Message}");
+            }
+
+            try
+            {
+                Process.Start(dest);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error opening file: {ex.Message}");
+            }
         }
 
         private void Client_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
             progressBar.Value = e.ProgressPercentage;
+        }
+
+        private void CancelBtn_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
         }
     }
 }
